@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Registrate - Argentour</title>
+  <link rel="stylesheet" href="styles2.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .error-message, .success-message {
+      font-weight: bold;
+      margin-bottom: 1rem;
+      display: none;
+      padding: 0.5rem;
+      border-radius: 5px;
+    }
+
+    .error-message {
+      background-color: #ffe0e0;
+      color: #cc0000;
+    }
+
+    .success-message {
+      background-color: #e0ffe0;
+      color: #006600;
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-wrapper">
+    <div class="auth-container">
+      <div class="auth-box">
+        <h2>Bienvenido a tu próximo viaje</h2>
+
+        <div class="error-message" id="error-message"></div>
+        <div class="success-message" id="success-message"></div>
+
+        <div class="input-group">
+          <i class="fas fa-user"></i>
+          <input type="text" id="nombre" placeholder="Nombre completo" required>
+        </div>
+
+        <div class="input-group">
+          <i class="fas fa-envelope"></i>
+          <input type="email" id="email" placeholder="Correo electrónico" required>
+        </div>
+
+        <div class="input-group">
+          <i class="fas fa-lock"></i>
+          <input type="password" id="password" placeholder="Contraseña" required>
+        </div>
+
+        <button type="button" onclick="registrar()">
+          <span id="button-text">Registrarse</span>
+          <span id="loading" style="display: none;"><i class="fas fa-spinner"></i></span>
+        </button>
+
+        <p class="auth-footer">¿Ya tienes cuenta? <a href="inicios.html">Inicia sesión</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function registrar() {
+      const nombre = document.getElementById('nombre').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const errorMsg = document.getElementById('error-message');
+      const successMsg = document.getElementById('success-message');
+
+      errorMsg.style.display = "none";
+      successMsg.style.display = "none";
+
+      if (!nombre || !email || !password) {
+        errorMsg.textContent = "Por favor completá todos los campos.";
+        errorMsg.style.display = "block";
+        return;
+      }
+
+      fetch('http://localhost:3000/api/auth/registro', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombre, email, password })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          successMsg.textContent = "¡Registro exitoso! Redirigiendo...";
+          successMsg.style.display = "block";
+
+          setTimeout(() => {
+            window.location.href = 'inicios.html'; 
+          }, 2000);
+        } else {
+          errorMsg.textContent = data.message || "Error al registrar.";
+          errorMsg.style.display = "block";
+        }
+      })
+      .catch(err => {
+        console.error("Error en registro:", err);
+        errorMsg.textContent = "Error al conectar con el servidor.";
+        errorMsg.style.display = "block";
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Inicia sesión - Argentour</title>
+  <link rel="stylesheet" href="styles2.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .error-message {
+      color: red;
+      font-weight: bold;
+      margin-top: 1rem;
+      text-align: center;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-box">
+      <h2>Bienvenido a tu próximo viaje</h2>
+
+      <div class="error-message" id="error-message"></div>
+
+      <div class="input-group">
+        <i class="fas fa-envelope"></i>
+        <input type="email" id="email" placeholder="Correo electrónico" required>
+      </div>
+
+      <div class="input-group">
+        <i class="fas fa-lock"></i>
+        <input type="password" id="password" placeholder="Contraseña" required>
+      </div>
+
+      <button type="button" onclick="login()">
+        <span id="button-text">Iniciar sesión</span>
+        <span id="loading" style="display: none;"><i class="fas fa-spinner"></i></span>
+      </button>
+
+      <div class="checkbox-container" style="margin-top: 1rem;">
+        <input type="checkbox">
+        <span class="checkmark"></span>
+      </div>
+
+      <p class="auth-footer">¿No tienes cuenta? <a href="registro.html">Registrate</a></p>
+    </div>
+  </div>
+
+  <script>
+    function login() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const errorMsg = document.getElementById('error-message');
+
+      errorMsg.style.display = "none";
+
+      if (!email || !password) {
+        errorMsg.textContent = "Por favor completá todos los campos.";
+        errorMsg.style.display = "block";
+        return;
+      }
+
+      fetch('http://localhost:3000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          localStorage.setItem('nombre', email);
+          window.location.href = 'index.html';
+        } else {
+          errorMsg.textContent = data.mensaje || "Correo o contraseña incorrectos";
+          errorMsg.style.display = "block";
+        }
+      })
+      .catch(err => {
+        console.error("Error en login:", err);
+        errorMsg.textContent = "Error al conectar con el servidor";
+        errorMsg.style.display = "block";
+      });
+    }
+  </script>
+</body>
+</html>
